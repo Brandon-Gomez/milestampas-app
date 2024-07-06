@@ -18,7 +18,6 @@ class VariationResource extends JsonResource
             'id' => $this->id,
             'category_id' => $this->category_id,
             'name' => $this->name,
-            'variation_options' => VariationOptionsResource::collection($this->whenLoaded('variationOptions')),
 
         ];
     }

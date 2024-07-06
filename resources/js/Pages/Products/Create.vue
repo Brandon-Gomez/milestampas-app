@@ -18,6 +18,7 @@ const form = useForm({
     image: "",
     category_id: "",
     variation_id: "",
+    variationOption_id: "",
 });
 
 const loadFile = (event) => {
@@ -38,14 +39,31 @@ watch(
         getVariations(newValue);
     }
 );
+watch(
+
+    () => form.variation_id,
+    (newValue) => {
+        getVariationOptions(newValue);
+    }
+);
+
 
 let variations = ref({});
 
+let variationOptions = ref({});
+
 const getVariations = (category_id) => {
     axios.get("/api/variations?category_id=" + category_id).then((response) => {
+        variationOptions = ref({});
         variations.value = response.data;
     });
 };
+
+const getVariationOptions = (variation_id) => {
+    axios.get("/api/variationOptions?variation_id=" + variation_id).then((response) => {
+        variationOptions.value = response.data;
+    });
+}
 
 </script>
 
@@ -132,7 +150,7 @@ const getVariations = (category_id) => {
                                     </div>
                                     <div class="col-span-6 sm:col-span-3">
                                         <label for="variation_id"
-                                            class="block text-sm font-medium text-gray-700">Section</label>
+                                            class="block text-sm font-medium text-gray-700">Variation</label>
                                         <select v-model="form.variation_id" id="variation_id"
                                             class="block w-full px-3 py-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                             :class="{
@@ -147,6 +165,25 @@ const getVariations = (category_id) => {
                                             </option>
                                         </select>
                                         <InputError class="mt-2" :message="form.errors.variation_id" />
+                                    </div>
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="variationOption_id"
+                                            class="block text-sm font-medium text-gray-700">Variation
+                                            option</label>
+                                        <select v-model="form.variationOption_id" id="variationOption_id"
+                                            class="block w-full px-3 py-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            :class="{
+                                                'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300':
+                                                    form.errors.section_id,
+                                            }">
+                                            <option value="">
+                                                Select a Variation option
+                                            </option>
+                                            <option v-for="option in variationOptions.data" :value="option.id">
+                                                {{ option.name }}
+                                            </option>
+                                        </select>
+                                        <InputError class="mt-2" :message="form.errors.variationOption_id" />
                                     </div>
                                 </div>
                             </div>

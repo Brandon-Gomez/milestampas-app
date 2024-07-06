@@ -11,6 +11,8 @@ class Variation extends Model
 
     protected $fillable = ['name', 'category_id'];
 
+    protected $with = ['variationOptions'];
+
     public function category()
     {
         return $this->belongsTo(Category::class);
