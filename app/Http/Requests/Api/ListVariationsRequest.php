@@ -22,7 +22,7 @@ class ListVariationsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'variation_id' => 'required|integer|exists:variations,id',
+            //
         ];
     }
 }

@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Variation_option extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'variation_id'];
+
+    public function variation()
+    {
+        return $this->belongsTo(Variation::class);
+    }
 }
