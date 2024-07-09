@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+        $this->down();
+        Schema::enableForeignKeyConstraints();
+
         Schema::create('product_configurations', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->foreignId('product_item_id')->constrained();
+            $table->foreignId('variation_option_id')->constrained();
+
         });
     }
 

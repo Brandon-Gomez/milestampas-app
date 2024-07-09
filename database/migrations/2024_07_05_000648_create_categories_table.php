@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+        $this->down();
+        Schema::enableForeignKeyConstraints();
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('parent_category_id')->nullable()->constrained('categories');
+            $table->string('name');
         });
     }
 

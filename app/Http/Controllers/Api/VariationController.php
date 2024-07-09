@@ -11,7 +11,7 @@ class VariationController extends Controller
 {
     public function __invoke(ListVariationsRequest $request)
     {
-        $variations = Variation::where('category_id', $request->category_id)->get();
+        $variations = Variation::where('product_id', $request->product_id)->get();
 
         return VariationResource::collection($variations);
     }

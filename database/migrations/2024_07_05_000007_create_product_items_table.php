@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+        $this->down();
+        Schema::enableForeignKeyConstraints();
 
         Schema::create('product_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->string('sku')->unique();
-            $table->integer('qty_in_stock');
-            $table->string('product_image')->nullable();
+            $table->foreignId('product_id')->constrained();
+            // $table->string('sku')->unique();
+            // $table->integer('qty_in_stock');
+            $table->string('product_image');
             $table->decimal('price', 10, 2);
         });
     }
