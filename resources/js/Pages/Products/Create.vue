@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
 import Pagination from "@/Components/Pagination.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-import { watch, ref, onMounted } from "vue";
+import { watch, ref, reactive } from "vue";
 import axios from "axios";
 import InputError from "@/Components/InputError.vue";
 
@@ -15,45 +15,52 @@ const props = defineProps({
         type: Object
     }
 });
+
 const objvariations = ref({});
 
 for (let index = 0; index < props.variations.length; index++) {
     const element = props.variations[index];
-    objvariations.value[element.id] = {
-        price: 0,
-        selected: "",
-        image: "",
-    };
+    objvariations.value[element.id] = {};
 }
 
 const form = useForm({
     name: "",
-    product_image: "",
+    file: null,
     description: "",
     category_id: "",
-    price: 0,
+    price: null,
     variations: objvariations
 });
 
-const loadFile = (event) => {
-    const input = event.target;
-    const file = input.files[0];
-    form.product_image = file.name;
-    const type = file.type;
-    const output = document.getElementById('preview_img');
-    output.src = URL.createObjectURL(event.target.files[0]);
-    output.onload = function () {
-        URL.revokeObjectURL(output.src); // free memory
-    };
-};
+// Método para actualizar el modelo de archivo de la variación
+function updateFileModel(event, variationId = null) {
+    const file = event.target.files[0];
+    if (variationId) {
 
-let variationOptions = ref({});
+        return objvariations.value[variationId].file = file;
+    }
+    return form.file = file
+}
+
+// Método para generar una vista previa del archivo seleccionado
+function previewVariationImage(variationId) {
+    if (objvariations.value[variationId].file) {
+        return URL.createObjectURL(objvariations.value[variationId].file);
+    }
+    return ''; // URL de una imagen por defecto o dejar vacío
+}
+
+function previewImage() {
+    if (form.file) {
+        return URL.createObjectURL(form.file);
+    }
+    return ''; // URL de una imagen por defecto o dejar vacío
+}
 
 watch(objvariations, (newValue) => {
     // Actualiza `form.variations` manualmente cada vez que `objvariations` cambie
     form.variations = newValue;
 }, { deep: true }); // La opción { deep: true } es para observar cambios profundos dentro del objeto
-
 
 const getVariationOptions = (variation_id) => {
     axios.get("/api/variationOptions?variation_id=" + variation_id).then((response) => {
@@ -64,7 +71,6 @@ const getVariationOptions = (variation_id) => {
 const createProduct = () => {
     form.post(route("products.store"))
 };
-
 
 </script>
 
@@ -81,7 +87,7 @@ const createProduct = () => {
         <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-12 lg:gap-x-5">
                 <div class="space-y-6 sm:px-6 lg:px-0 lg:col-span-12">
-                    <form @submit.prevent="createProduct">
+                    <form @submit.prevent="createProduct" enctype="multipart/form-data">
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="px-4 py-6 space-y-6 bg-white sm:p-6">
                                 <div>
@@ -117,17 +123,20 @@ const createProduct = () => {
                                     <div class="col-span-6 sm:col-span-3">
                                         <div class="flex items-center space-x-6">
                                             <div class="shrink-0">
-                                                <img id='preview_img' class="object-cover w-16 h-16 rounded"
-                                                    src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
-                                                    alt="Current product photo" />
+                                                <div v-if="form.file">
+                                                    <img :src="previewImage()" class="object-cover w-16 h-16 rounded"
+                                                        alt="Preview">
+                                                </div>
+                                                <div v-else>
+                                                    <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                        class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                </div>
                                             </div>
+
                                             <label class="block">
-                                                <span class="sr-only">Choose profile photo</span>
-                                                <input type="file" @change="loadFile"
-                                                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 " />
+                                                <input type="file" @change="updateFileModel($event)"
+                                                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100 " />
                                                 <InputError class="mt-2" :message="form.errors.product_image" />
-
-
                                             </label>
                                         </div>
 
@@ -162,10 +171,11 @@ const createProduct = () => {
                             <TabPanels>
                                 <TabPanel v-for="variation in variations" :value="variation.id.toString()">
                                     <p class="m-0 ">
+
                                     <div class="col-span-6 sm:col-span-3">
                                         <label class="block text-sm font-medium text-gray-700">Variation
                                             option</label>
-                                        <MultiSelect v-model="objvariations[variation.id].selected"
+                                        <MultiSelect v-model="objvariations[variation.id].options"
                                             :options="variation.variation_options" optionValue="id" optionLabel="name"
                                             placeholder="Select options" />
 
@@ -178,14 +188,19 @@ const createProduct = () => {
                                     </div>
                                     <div class="flex items-center space-x-6">
                                         <div class="shrink-0">
-                                            <img id='preview_img' class="object-cover w-16 h-16 rounded"
-                                                src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
-                                                alt="Current product photo" />
+                                            <div v-if="objvariations[[variation.id]].file">
+                                                <img :src="previewVariationImage(variation.id)"
+                                                    class="object-cover w-16 h-16 rounded" alt="Preview">
+                                            </div>
+                                            <div v-else>
+                                                <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                    class="object-cover w-16 h-16 rounded" alt="Preview">
+                                            </div>
                                         </div>
+
                                         <label class="block">
-                                            <span class="sr-only">Choose profile photo</span>
-                                            <input type="file" @change="loadFile"
-                                                class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 " />
+                                            <input type="file" @change="updateFileModel($event, variation.id)"
+                                                class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100" />
                                             <!-- <InputError class="mt-2" :message="form.errors.product_image" /> -->
                                         </label>
                                     </div>
