@@ -21,10 +21,11 @@ class StoreProductRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'product_image' => ['required', 'string'],
+            'price' => ['required', 'numeric'],
             'category_id' => ['required', 'exists:categories,id'],
         ];
     }
@@ -34,7 +35,7 @@ class StoreProductRequest extends FormRequest
         return [
             'name' => 'Product Name',
             'description' => 'Product Description',
-            'product_image' => 'Product Image',
+            'price' => 'Product Price',
             'category_id' => 'Category',
         ];
     }

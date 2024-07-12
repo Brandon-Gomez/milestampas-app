@@ -1,0 +1,8 @@
+agregar stock a variations
+brands
+
+const getVariationOptions = (variation_id) => {
+    axios.get("/api/variationOptions?variation_id=" + variation_id).then((response) => {
+        variationOptions.value = response.data;
+    });
+};

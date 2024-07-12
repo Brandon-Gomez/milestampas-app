@@ -1,5 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
+import 'primeicons/primeicons.css';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -20,6 +21,12 @@ import TabPanels from 'primevue/tabpanels';
 import TabList from 'primevue/tablist';
 import Ripple from 'primevue/ripple';
 import InputNumber from 'primevue/inputnumber';
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
+import Card from 'primevue/card';
+import Carousel from 'primevue/carousel';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -30,6 +37,7 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(ToastService)
             .use(PrimeVue,{
                 ripple: true,
                 // unstyled: true,
@@ -52,6 +60,12 @@ createInertiaApp({
             .component('TabPanels', TabPanels)
             .component('TabList', TabList)
             .component('InputNumber', InputNumber)
+            .component('Toast', Toast)
+            .component('Card', Card)
+            .component('Carousel', Carousel)
+            .component('IconField', IconField)
+            .component('InputIcon', InputIcon)
+
             .directive('ripple', Ripple)
             .mount(el);
     },

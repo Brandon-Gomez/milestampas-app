@@ -3,14 +3,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from "vue";
 
-const selectedCities = ref();
-const cities = ref([
-    { name: 'New York', id: 'NY' },
-    { name: 'Rome', id: 'RM' },
-    { name: 'London', id: 'LDN' },
-    { name: 'Istanbul', id: 'IST' },
-    { name: 'Paris', id: 'PRS' }
-]);
+const fileupload = ref();
+
+const upload = () => {
+    fileupload.value.upload();
+};
 
 const toggleColorScheme = () => {
     const element = document.querySelector('html');
@@ -32,10 +29,11 @@ const toggleColorScheme = () => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <!-- <Button label="Toggle Color Scheme" @click="toggleColorScheme()" /> -->
+                        <Button label="Toggle Color Scheme" @click="toggleColorScheme()" />
+                        <FileUpload ref="fileupload" mode="basic" name="file" url="/api/uploadProductFile"
+                            accept="image/*" />
+                        <Button label="Upload" @click="upload" severity="secondary" />
 
-                        <MultiSelect v-model="selectedCities" :options="cities" optionLabel="name"
-                            placeholder="Select Cities" :maxSelectedLabels="3" class="w-full md:w-[20rem]" />
                     </div>
                 </div>
             </div>

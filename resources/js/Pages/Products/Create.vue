@@ -1,11 +1,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
-import Pagination from "@/Components/Pagination.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-import { watch, ref, reactive } from "vue";
+import { watch, ref } from "vue";
 import axios from "axios";
 import InputError from "@/Components/InputError.vue";
+import { useToast } from 'primevue/usetoast';
+import TabPanel from 'primevue/tabpanel';
 
 const props = defineProps({
     categories: {
@@ -16,21 +16,47 @@ const props = defineProps({
     }
 });
 
-const objvariations = ref({});
+const responsiveOptions = ref([
+    {
+        breakpoint: '1400px',
+        numVisible: 2,
+        numScroll: 1
+    },
+    {
+        breakpoint: '1199px',
+        numVisible: 3,
+        numScroll: 1
+    },
+    {
+        breakpoint: '767px',
+        numVisible: 2,
+        numScroll: 1
+    },
+    {
+        breakpoint: '575px',
+        numVisible: 1,
+        numScroll: 1
+    }
+]);
 
-for (let index = 0; index < props.variations.length; index++) {
-    const element = props.variations[index];
-    objvariations.value[element.id] = {};
-}
+// Suponiendo que `vars` es tu lista de tarjetas en el carrusel
+const vars = ref([
+    {
+        variation: '',
+        options: []
+
+    }
+]);
 
 const form = useForm({
     name: "",
-    file: null,
+    file: "",
     description: "",
     category_id: "",
-    price: null,
-    variations: objvariations
+    price: 0.00,
+    stock: 0,
 });
+
 
 // Método para actualizar el modelo de archivo de la variación
 function updateFileModel(event, variationId = null) {
@@ -39,7 +65,7 @@ function updateFileModel(event, variationId = null) {
 
         return objvariations.value[variationId].file = file;
     }
-    return form.file = file
+    return form.file = file;
 }
 
 // Método para generar una vista previa del archivo seleccionado
@@ -57,19 +83,39 @@ function previewImage() {
     return ''; // URL de una imagen por defecto o dejar vacío
 }
 
-watch(objvariations, (newValue) => {
-    // Actualiza `form.variations` manualmente cada vez que `objvariations` cambie
-    form.variations = newValue;
-}, { deep: true }); // La opción { deep: true } es para observar cambios profundos dentro del objeto
-
-const getVariationOptions = (variation_id) => {
-    axios.get("/api/variationOptions?variation_id=" + variation_id).then((response) => {
-        variationOptions.value = response.data;
-    });
-};
-
 const createProduct = () => {
     form.post(route("products.store"))
+};
+
+function addVariation() {
+    vars.value.push({ variation: '', options: [] });
+}
+
+const removeVariation = (index) => {
+    vars.value.splice(index, 1);
+};
+// Watcher para actualizar las opciones del MultiSelect basado en la selección del Select
+// vars.value.forEach((varCard, index) => {
+//     watch(() => varCard.variation, (newVal) => {
+//         const selectedVariation = variations.value.find(v => v.id === newVal);
+//         if (selectedVariation) {
+//             vars.value[index].options = selectedVariation.multiSelectOptions;
+//         }
+//     });
+// });
+
+const variationOptions = ref([]);
+
+const getVariationOptions = async (variation_id, slotIndex) => {
+    try {
+        const response = await axios.get(`/api/variationOptions?variation_id=${variation_id}`);
+        console.log(response.data);
+        // variationOptions.value = response.data;
+        // vars.value[slotIndex].options = variationOptions.value.data;
+    } catch (error) {
+        console.error("Error fetching variation options:", error);
+        // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
+    }
 };
 
 </script>
@@ -83,7 +129,9 @@ const createProduct = () => {
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Products</h2>
         </template>
 
+        <Toast />
         <!-- content -->
+
         <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-12 lg:gap-x-5">
                 <div class="space-y-6 sm:px-6 lg:px-0 lg:col-span-12">
@@ -98,54 +146,106 @@ const createProduct = () => {
                                         Use this form to create a new product.
                                     </p>
                                 </div>
-                                <div class="grid grid-cols-6 gap-6">
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label class="block text-sm font-medium text-gray-700">Name</label>
-                                        <InputText class="w-full" type="text" v-model="form.name" id="name" :class="{
-                                            'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300':
-                                                form.errors.name,
-                                        }" />
 
-                                        <InputError class="mt-2" :message="form.errors.name" />
-                                    </div>
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label class="block text-sm font-medium text-gray-700">Category</label>
 
-                                        <Select v-model="form.category_id" :options="categories.data" optionValue="id"
-                                            optionLabel="name" placeholder="Select a category" class="w-full" />
-                                        <InputError class="mt-2" :message="form.errors.category_id" />
-                                    </div>
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label class="block text-sm font-medium text-gray-700">Price</label>
-                                        <InputNumber v-model="form.price" :minFractionDigits="2"
-                                            :maxFractionDigits="2" />
-                                    </div>
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <div class="flex items-center space-x-6">
-                                            <div class="shrink-0">
-                                                <div v-if="form.file">
-                                                    <img :src="previewImage()" class="object-cover w-16 h-16 rounded"
-                                                        alt="Preview">
+                                <div class="flex">
+                                    <!-- Sección de inputs -->
+                                    <div class="w-1/2 p-4">
+                                        <div class="grid grid-cols-6 gap-6">
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <label class="block text-sm font-medium text-gray-700">Name</label>
+
+                                                <InputText class="w-full" type="text" v-model="form.name" id="name"
+                                                    :class="{
+                                                        'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300':
+                                                            form.errors.name,
+                                                    }" />
+                                                <InputError class="mt-2" :message="form.errors.name" />
+                                            </div>
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <label class="block text-sm font-medium text-gray-700">Category</label>
+                                                <Select v-model="form.category_id" :options="categories.data"
+                                                    optionValue="id" optionLabel="name" placeholder="Select a category"
+                                                    class="w-full" />
+                                                <InputError class="mt-2" :message="form.errors.category_id" />
+                                            </div>
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <label class="block text-sm font-medium text-gray-700">Price</label>
+                                                <InputNumber v-model="form.price" :minFractionDigits="2"
+                                                    :maxFractionDigits="2" class="w-full" />
+                                                <InputError class="mt-2" :message="form.errors.price" />
+
+                                            </div>
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <label class="block text-sm font-medium text-gray-700">Stock</label>
+                                                <InputNumber class="w-full" v-model="form.stock" />
+                                                <InputError class="mt-2" :message="form.errors.price" />
+
+                                            </div>
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <label
+                                                    class="block text-sm font-medium text-gray-700">Description</label>
+                                                <Textarea class="w-full" v-model="form.description" rows="5" cols="30"
+                                                    id="description" />
+                                                <InputError class="mt-2" :message="form.errors.description" />
+                                            </div>
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <div class="flex items-center space-x-6">
+                                                    <div class="shrink-0">
+                                                        <div v-if="form.file">
+                                                            <img :src="previewImage()"
+                                                                class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                        </div>
+                                                        <div v-else>
+                                                            <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                                class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                        </div>
+                                                    </div>
+
+                                                    <label class="block">
+                                                        <input type="file" @change="updateFileModel($event)"
+                                                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100 " />
+                                                        <InputError class="mt-2" :message="form.errors.image" />
+                                                    </label>
                                                 </div>
-                                                <div v-else>
-                                                    <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
-                                                        class="object-cover w-16 h-16 rounded" alt="Preview">
-                                                </div>
+
                                             </div>
 
-                                            <label class="block">
-                                                <input type="file" @change="updateFileModel($event)"
-                                                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100 " />
-                                                <InputError class="mt-2" :message="form.errors.product_image" />
-                                            </label>
                                         </div>
-
                                     </div>
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label class="block text-sm font-medium text-gray-700">Description</label>
-                                        <Textarea class="w-full" v-model="form.description" rows="5" cols="30"
-                                            id="description" />
-                                        <InputError class="mt-2" :message="form.errors.description" />
+
+                                    <!-- Sección de la tarjeta -->
+                                    <div class="w-1/2 p-4">
+                                        {{ vars }}
+                                        <Carousel :value="vars" :numVisible="1" :numScroll="1"
+                                            :responsiveOptions="responsiveOptions">
+                                            <template #item="{ index: slotIndex }">
+                                                <Card style="width: 25rem; overflow: hidden" class="mx-auto">
+                                                    <template #title>Variants</template>
+                                                    <template #subtitle>
+                                                        Option {{ slotIndex + 1 }}
+
+                                                        <a href="#" class="font-semibold text-green-500"
+                                                            @click.prevent="removeVariation(slotIndex)">Remove</a>
+                                                    </template>
+                                                    <template #content>
+                                                        <Select @change="getVariationOptions($event.value, slotIndex)"
+                                                            v-model="vars[slotIndex].variation" :options="variations"
+                                                            optionValue="id" optionLabel="name"
+                                                            placeholder="Select a variant" class="w-full mb-3" />
+                                                        <MultiSelect v-model="vars.options" optionValue="id"
+                                                            optionLabel="name" placeholder="Select options" />
+                                                    </template>
+                                                    <template #footer>
+                                                        <div class="flex gap-3 mt-1">
+                                                            <Button @click.prevent="addVariation"
+                                                                label="Add another option" class="w-full" />
+                                                        </div>
+                                                    </template>
+                                                </Card>
+                                            </template>
+                                        </Carousel>
+
                                     </div>
                                 </div>
                             </div>
@@ -160,12 +260,21 @@ const createProduct = () => {
                                 </button>
                             </div>
                         </div>
+
                         <!-- tabs -->
-                        <Tabs value="1">
+                        <!-- <Tabs value="1">
                             <TabList>
                                 <Tab class="capitalize" v-for="variation in variations"
                                     :value="variation.id.toString()">
                                     {{ variation.name }}
+                                </Tab>
+                                <Tab>
+
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
                                 </Tab>
                             </TabList>
                             <TabPanels>
@@ -178,14 +287,13 @@ const createProduct = () => {
                                         <MultiSelect v-model="objvariations[variation.id].options"
                                             :options="variation.variation_options" optionValue="id" optionLabel="name"
                                             placeholder="Select options" />
-
-                                        <!-- <InputError class="mt-2" :message="form.errors.variationOption_id" /> -->
                                     </div>
                                     <div class="my-3">
                                         <label class="block text-sm font-medium text-gray-700">Price</label>
                                         <InputNumber v-model="objvariations[variation.id].price" :minFractionDigits="2"
                                             :maxFractionDigits="2" />
                                     </div>
+
                                     <div class="flex items-center space-x-6">
                                         <div class="shrink-0">
                                             <div v-if="objvariations[[variation.id]].file">
@@ -201,18 +309,23 @@ const createProduct = () => {
                                         <label class="block">
                                             <input type="file" @change="updateFileModel($event, variation.id)"
                                                 class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100" />
-                                            <!-- <InputError class="mt-2" :message="form.errors.product_image" /> -->
                                         </label>
                                     </div>
-
-
                                     </p>
                                 </TabPanel>
+                                <TabPanel>
+
+                                    <Select v-model="form.category_id" :options="categories.data" optionValue="id"
+                                        optionLabel="name" placeholder="Select a category" class="w-full" />
+                                </TabPanel>
                             </TabPanels>
-                        </Tabs>
+                        </Tabs> -->
                     </form>
                 </div>
             </div>
         </div>
+
+
+
     </AuthenticatedLayout>
 </template>

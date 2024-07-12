@@ -33,9 +33,34 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        Product::create($request->validated());
 
-        return redirect()->route('products.index');
+        $name = $request->name;
+        $description = $request->description;
+        $category_id = $request->category_id;
+        $price = $request->price;
+        $stock = $request->stock;
+        // $image = explode('/', $request->file('file')->store('public/products'));
+        // $image = $image[1];
+        if ($request->has('variations')) {
+
+            foreach ($request->variations as $variation) {
+
+                $variation['options'];
+                dd($variation['options']);
+                $variation['stock'];
+
+                // if ($variation['file']) {
+                //     $var_image = explode('/', $variation['file']->store('public/products'));
+                //     $var_image = $var_image[1];
+                // }
+            }
+        }
+
+        // Product::create(
+        //     $request->validated() + ['image' => $path]
+        // );
+
+        //     return redirect()->route('products.index');
     }
 
     public function destroy(Product $product)

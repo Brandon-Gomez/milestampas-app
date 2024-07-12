@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::disableForeignKeyConstraints();
-        $this->down();
-        Schema::enableForeignKeyConstraints();
+
+        Schema::drop('products');
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained();
             $table->string('name');
             $table->text('description');
-            $table->string('product_image');
         });
     }
 

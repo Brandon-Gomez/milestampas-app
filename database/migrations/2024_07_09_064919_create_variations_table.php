@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::drop('variations');
+
         Schema::create('variations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
