@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::drop('product_configurations');
         Schema::create('product_configurations', function (Blueprint $table) {
             $table->foreignId('product_item_id')->constrained();
             $table->foreignId('variation_option_id')->constrained();
-            $table->integer('stock')->nullable();
+            $table->integer('qyt_in_stock')->nullable();
             $table->decimal('price', 10, 2);
         });
     }

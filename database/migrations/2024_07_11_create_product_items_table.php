@@ -15,10 +15,14 @@ return new class extends Migration
         Schema::create('product_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained();
+            $table->decimal('price', 10, 2);
+        
+            $table->integer('qyt_in_stock')->nullable();
             $table->string('sku')->nullable();
-            $table->string('image');
-            $table->string('image2');
-            $table->string('image3');
+            $table->string('image')->nullable();
+            $table->string('image2')->nullable();
+            $table->string('image3')->nullable();
+
         });
     }
 

@@ -27,6 +27,11 @@ import Card from 'primevue/card';
 import Carousel from 'primevue/carousel';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';   // optional
+import Row from 'primevue/row';                   // optional
+
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -65,6 +70,9 @@ createInertiaApp({
             .component('Carousel', Carousel)
             .component('IconField', IconField)
             .component('InputIcon', InputIcon)
+            .component('DataTable', DataTable)
+            .component('Column', Column)
+            .component('Row', Row)
 
             .directive('ripple', Ripple)
             .mount(el);

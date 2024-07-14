@@ -39,47 +39,43 @@ const responsiveOptions = ref([
     }
 ]);
 
-// Suponiendo que `vars` es tu lista de tarjetas en el carrusel
-const vars = ref([
-    {
-        variation: '',
-        options: []
-
-    }
+// Suponiendo que `cards` es tu lista de tarjetas en el carrusel
+const cards = ref([
+    {}
 ]);
+
+const page = ref(0);
 
 const form = useForm({
     name: "",
-    file: "",
+    file: null,
     description: "",
     category_id: "",
-    price: 0.00,
-    stock: 0,
+    price: null,
+    qyt_in_stock: null,
+    variations: cards
+
 });
 
-
 // Método para actualizar el modelo de archivo de la variación
-function updateFileModel(event, variationId = null) {
+function updateFileModel(event, variationIndex = null, variationFlag = false) {
     const file = event.target.files[0];
-    if (variationId) {
-
-        return objvariations.value[variationId].file = file;
+    if (variationFlag) {
+        cards.value[variationIndex].file = {};
+        return cards.value[variationIndex].file = file;
     }
     return form.file = file;
 }
 
 // Método para generar una vista previa del archivo seleccionado
-function previewVariationImage(variationId) {
-    if (objvariations.value[variationId].file) {
-        return URL.createObjectURL(objvariations.value[variationId].file);
+function previewImage(variationIndex, variationFlag = false) {
+    if (variationFlag) {
+        return URL.createObjectURL(cards.value[variationIndex].file);
     }
-    return ''; // URL de una imagen por defecto o dejar vacío
-}
-
-function previewImage() {
-    if (form.file) {
+    else if (form.file != null && !variationFlag) {
         return URL.createObjectURL(form.file);
     }
+
     return ''; // URL de una imagen por defecto o dejar vacío
 }
 
@@ -88,35 +84,32 @@ const createProduct = () => {
 };
 
 function addVariation() {
-    vars.value.push({ variation: '', options: [] });
+    cards.value.push({ options: [] });
 }
 
 const removeVariation = (index) => {
-    vars.value.splice(index, 1);
+    cards.value.splice(index, 1);
+    page.value = 0;
 };
-// Watcher para actualizar las opciones del MultiSelect basado en la selección del Select
-// vars.value.forEach((varCard, index) => {
-//     watch(() => varCard.variation, (newVal) => {
-//         const selectedVariation = variations.value.find(v => v.id === newVal);
-//         if (selectedVariation) {
-//             vars.value[index].options = selectedVariation.multiSelectOptions;
-//         }
-//     });
-// });
 
 const variationOptions = ref([]);
 
 const getVariationOptions = async (variation_id, slotIndex) => {
     try {
+        variationOptions.value[slotIndex] = [];
+        cards.value[slotIndex].options = null;
         const response = await axios.get(`/api/variationOptions?variation_id=${variation_id}`);
-        console.log(response.data);
-        // variationOptions.value = response.data;
-        // vars.value[slotIndex].options = variationOptions.value.data;
+        variationOptions.value[slotIndex] = response.data.data;
     } catch (error) {
         console.error("Error fetching variation options:", error);
         // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
 };
+
+// watcher cards uplaod to form
+watch(cards, (value) => {
+    form.variations = value;
+}, { deep: true });
 
 </script>
 
@@ -177,9 +170,10 @@ const getVariationOptions = async (variation_id, slotIndex) => {
 
                                             </div>
                                             <div class="col-span-6 sm:col-span-6">
-                                                <label class="block text-sm font-medium text-gray-700">Stock</label>
-                                                <InputNumber class="w-full" v-model="form.stock" />
-                                                <InputError class="mt-2" :message="form.errors.price" />
+                                                <label class="block text-sm font-medium text-gray-700">Quantity in
+                                                    Stock</label>
+                                                <InputNumber class="w-full" v-model="form.qyt_in_stock" />
+                                                <InputError class="mt-2" :message="form.errors.qyt_in_stock" />
 
                                             </div>
                                             <div class="col-span-6 sm:col-span-6">
@@ -203,43 +197,70 @@ const getVariationOptions = async (variation_id, slotIndex) => {
                                                     </div>
 
                                                     <label class="block">
-                                                        <input type="file" @change="updateFileModel($event)"
+                                                        <input type="file"
+                                                            @change="updateFileModel($event, null, false)"
                                                             class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100 " />
-                                                        <InputError class="mt-2" :message="form.errors.image" />
                                                     </label>
+
                                                 </div>
+                                                <InputError class="mt-2" :message="form.errors.image" />
 
                                             </div>
 
                                         </div>
                                     </div>
-
                                     <!-- Sección de la tarjeta -->
                                     <div class="w-1/2 p-4">
-                                        {{ vars }}
-                                        <Carousel :value="vars" :numVisible="1" :numScroll="1"
+                                        <Carousel :key="cards.length" :value="cards" :numVisible="1" :numScroll="1"
                                             :responsiveOptions="responsiveOptions">
                                             <template #item="{ index: slotIndex }">
                                                 <Card style="width: 25rem; overflow: hidden" class="mx-auto">
                                                     <template #title>Variants</template>
                                                     <template #subtitle>
                                                         Option {{ slotIndex + 1 }}
-
-                                                        <a href="#" class="font-semibold text-green-500"
+                                                        <a v-if="cards.length != 1" href="#"
+                                                            class="font-semibold text-green-500 ml-1"
                                                             @click.prevent="removeVariation(slotIndex)">Remove</a>
                                                     </template>
                                                     <template #content>
                                                         <Select @change="getVariationOptions($event.value, slotIndex)"
-                                                            v-model="vars[slotIndex].variation" :options="variations"
+                                                            v-model="cards[slotIndex].variation" :options="variations"
                                                             optionValue="id" optionLabel="name"
                                                             placeholder="Select a variant" class="w-full mb-3" />
-                                                        <MultiSelect v-model="vars.options" optionValue="id"
-                                                            optionLabel="name" placeholder="Select options" />
+                                                        <MultiSelect v-model="cards[slotIndex].options"
+                                                            :options="variationOptions[slotIndex]" optionValue="id"
+                                                            optionLabel="name" placeholder="Select options"
+                                                            class="w-full mb-3" />
+                                                        <InputNumber placeholder="Variant price"
+                                                            v-model="cards[slotIndex].price" :minFractionDigits="2"
+                                                            :maxFractionDigits="2" class="w-full mb-3" />
+                                                        <InputNumber placeholder="Variant quantity in stock"
+                                                            v-model="cards[slotIndex].qyt_in_stock"
+                                                            class="w-full mb-3" />
+                                                        <div class="flex items-center content-center">
+                                                            <div v-if="cards[slotIndex].file">
+                                                                <img :src="previewImage(slotIndex, true)"
+                                                                    class="object-cover w-16 h-16 rounded"
+                                                                    alt="Preview">
+                                                            </div>
+                                                            <div v-else>
+                                                                <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                                    class="object-cover w-16 h-16 rounded"
+                                                                    alt="Preview">
+
+                                                            </div>
+                                                            <div>
+                                                                <input type="file"
+                                                                    @change="updateFileModel($event, slotIndex, true)"
+                                                                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100" />
+                                                            </div>
+                                                        </div>
+
                                                     </template>
                                                     <template #footer>
                                                         <div class="flex gap-3 mt-1">
                                                             <Button @click.prevent="addVariation"
-                                                                label="Add another option" class="w-full" />
+                                                                label="Add another variant" class="w-full" />
                                                         </div>
                                                     </template>
                                                 </Card>
@@ -250,19 +271,17 @@ const getVariationOptions = async (variation_id, slotIndex) => {
                                 </div>
                             </div>
                             <div class="px-4 py-3 text-right bg-gray-50 sm:px-6">
-                                <Link :href="route('products.index')"
-                                    class="inline-flex items-center px-4 py-2 mr-4 text-sm font-medium text-indigo-700 bg-indigo-100 border border-transparent rounded-md hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Cancel
+                                <Link :href="route('products.index')">
+                                <Button class="mr-4" label="Cancel" severity="secondary" outlined />
                                 </Link>
-                                <button type="submit"
-                                    class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Save
-                                </button>
+
+                                <Button type="submit" label="Save" />
                             </div>
                         </div>
+                    </form>
 
-                        <!-- tabs -->
-                        <!-- <Tabs value="1">
+                    <!-- tabs -->
+                    <!-- <Tabs value="1">
                             <TabList>
                                 <Tab class="capitalize" v-for="variation in variations"
                                     :value="variation.id.toString()">
@@ -320,7 +339,6 @@ const getVariationOptions = async (variation_id, slotIndex) => {
                                 </TabPanel>
                             </TabPanels>
                         </Tabs> -->
-                    </form>
                 </div>
             </div>
         </div>

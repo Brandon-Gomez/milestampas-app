@@ -23,10 +23,7 @@ class StoreProductRequest extends FormRequest
     {
 
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'price' => ['required', 'numeric'],
-            'category_id' => ['required', 'exists:categories,id'],
+          
         ];
     }
 
@@ -36,7 +33,9 @@ class StoreProductRequest extends FormRequest
             'name' => 'Product Name',
             'description' => 'Product Description',
             'price' => 'Product Price',
+            'stock' => 'Product Stock',
             'category_id' => 'Category',
+            'image' => 'Product Image',
         ];
     }
 }

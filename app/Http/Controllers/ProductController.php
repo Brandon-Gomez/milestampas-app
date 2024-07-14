@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
-use App\Models\Category; // Add this line
-use App\Models\Product; // Add this line
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\Variation;
 
 class ProductController extends Controller
@@ -34,33 +34,58 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
 
-        $name = $request->name;
-        $description = $request->description;
-        $category_id = $request->category_id;
-        $price = $request->price;
-        $stock = $request->stock;
-        // $image = explode('/', $request->file('file')->store('public/products'));
-        // $image = $image[1];
-        if ($request->has('variations')) {
+        $product = Product::create(
+            $request->validate([
+                'name' => ['required', 'max:255'],
+                'description' => ['required', 'string'],
+                'price' => ['required', 'numeric'],
+                'qyt_in_stock' => ['required', 'numeric'],
+                'category_id' => ['required', 'exists:categories,id'],
+                'file' => ['required'],
+            ])
+        );
+
+        $image = explode('/', $request->file('file')->store('public/products'));
+        $product->items()->create([
+            'sku' => $product->id.'-'.$product->name,
+            'qyt_in_stock' => $request->qyt_in_stock,
+            'image' => $image[2],
+            'price' => $request->price,
+        ]);
+
+        if ($request->variations) {
 
             foreach ($request->variations as $variation) {
 
-                $variation['options'];
-                dd($variation['options']);
-                $variation['stock'];
+                if (! $variation['variation'] || ! $variation['options'] || ! $variation['price'] || ! $variation['qyt_in_stock']) {
+                    continue;
+                }
 
-                // if ($variation['file']) {
-                //     $var_image = explode('/', $variation['file']->store('public/products'));
-                //     $var_image = $var_image[1];
-                // }
+                if (! empty($variation['file'])) {
+                    $variation['file']->store('public/products');
+                    $varImage = explode('/', $variation['file']->store('public/products'));
+                }
+
+                foreach ($variation['options'] as $optionId) {
+
+                    $productItem = $product->items()->create([
+                        'sku' => $product->id.'-'.$product->name,
+                        'qyt_in_stock' => $variation['qyt_in_stock'],
+                        'image' => $varImage[2] ?? null,
+                        'price' => $variation['price'],
+                    ]);
+
+                    $productItem->configuration()->create([
+                        'variation_option_id' => $optionId,
+                        'qyt_in_stock' => $variation['qyt_in_stock'],
+                        'price' => $variation['price'],
+                    ]);
+                }
+
             }
         }
 
-        // Product::create(
-        //     $request->validated() + ['image' => $path]
-        // );
-
-        //     return redirect()->route('products.index');
+        return redirect()->route('products.index');
     }
 
     public function destroy(Product $product)
