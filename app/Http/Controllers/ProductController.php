@@ -40,13 +40,10 @@ class ProductController extends Controller
         $variations = Variation::all();
         $product = Product::find($productId);
 
-        $product_options = $product->options()->get();
-
         return inertia('Products/Edit', [
             'product' => ProductResource::make($product),
             'categories' => $categories,
             'variations' => $variations,
-            'productOptions' => $product_options,
         ]);
     }
 
@@ -125,11 +122,52 @@ class ProductController extends Controller
             'unlimited' => $request->unlimited,
         ]);
 
+        // if variations are sent
+        if ($request->variations) {
+
+            // delete all variations
+            $product->options()->delete();
+
+            // create new variations
+            foreach ($request->variations as $variation) {
+
+                $validator = Validator::make($variation, [
+                    'options' => ['required'],
+                    'variation_price' => ['required', 'numeric'],
+                ]);
+
+                if ($validator->fails()) {
+                    return redirect()->back()->withErrors($validator->errors());
+                }
+
+                foreach ($variation['options'] as $optionId) {
+
+                    $product->options()->create([
+                        'product_id' => $product['id'],
+                        'variation_id' => $variation['variation'],
+                        'variation_option_id' => $optionId,
+                        'price_increment' => $variation['variation_price'],
+                    ]);
+
+                }
+
+            }
+        }
+
         return redirect()->route('products.index');
     }
 
     public function destroy(Product $product)
     {
+        if (Storage::disk('public')->exists('products/'.$product->image)) {
+            Storage::disk('public')->delete('products/'.$product->image);
+        }
+        if (Storage::disk('public')->exists('products/'.$product->image2)) {
+            Storage::disk('public')->delete('products/'.$product->image2);
+        }
+        if (Storage::disk('public')->exists('products/'.$product->image3)) {
+            Storage::disk('public')->delete('products/'.$product->image3);
+        }
         $product->delete();
     }
 }

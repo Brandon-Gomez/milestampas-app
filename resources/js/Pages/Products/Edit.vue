@@ -55,15 +55,9 @@ const cards = ref([
 // onmount set cards produ
 
 let product = usePage().props.product.data;
-
+// let product_options = usePage().props.product_options.data;
 // onmount set cards product options
-onMounted(() => {
-    alert(product.options);
-    if (product.options) {
-        console.log(product.options);
-        // cards.value = product.options;
-    }
-});
+
 
 const form = useForm({
     id: product.id,
@@ -85,7 +79,7 @@ const createProduct = () => {
     }))
 }
 function addVariation() {
-    cards.value.push({ options: [] });
+    cards.value.push({});
 }
 const page = ref(0);
 const removeVariation = (index) => {
