@@ -30,9 +30,17 @@ const toggleColorScheme = () => {
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <Button label="Toggle Color Scheme" @click="toggleColorScheme()" />
-                        <FileUpload ref="fileupload" mode="basic" name="file" url="/api/uploadProductFile"
-                            accept="image/*" />
-                        <Button label="Upload" @click="upload" severity="secondary" />
+
+                        <FileUpload name="file" url="/api/uploadProduct" accept="image/*" :maxFileSize="10000000"
+                            :fileLimit="2">
+                            <template #empty>
+                                <span>Drag and drop files to here to upload.</span>
+                            </template>
+                        </FileUpload>
+                        <!-- input texto -->
+                        <input type="text" name="name" id="name"
+                            class="block w-full mt-1 rounded-md shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300"
+                            placeholder="Name" required>
 
                     </div>
                 </div>

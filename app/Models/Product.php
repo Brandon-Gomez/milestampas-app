@@ -9,19 +9,22 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'category_id'];
+    protected $guarded = [];
 
     protected $with = ['category'];
-
-    public $timestamps = false;
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function items()
+    // public function items()
+    // {
+    //     return $this->hasMany(Product_item::class);
+    // }
+
+    public function options()
     {
-        return $this->hasMany(Product_item::class);
+        return $this->hasMany(Product_options::class);
     }
 }

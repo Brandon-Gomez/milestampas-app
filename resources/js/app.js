@@ -29,9 +29,8 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import ColumnGroup from 'primevue/columngroup';   // optional
-import Row from 'primevue/row';                   // optional
-
+import Row from 'primevue/row';
+import Badge from 'primevue/badge';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -73,7 +72,7 @@ createInertiaApp({
             .component('DataTable', DataTable)
             .component('Column', Column)
             .component('Row', Row)
-
+            .component('Badge', Badge)
             .directive('ripple', Ripple)
             .mount(el);
     },
@@ -81,3 +80,4 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
+

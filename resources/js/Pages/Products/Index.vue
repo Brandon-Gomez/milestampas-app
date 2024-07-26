@@ -15,16 +15,21 @@ defineProps({
 const deletForm = useForm({});
 const deleteProduct = (productId) => {
     if (confirm('Are you sure you want to delete this produt?')) {
+
         deletForm.delete(route('products.destroy', productId));
+
     }
 }
 
+const formatDate = (date) => {
+    return new Date(date).toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false });
+}
 
 </script>
 
 <template>
 
-    <Head title="Products list" />
+    <Head title="Products" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -48,18 +53,60 @@ const deleteProduct = (productId) => {
                                     </div>
 
                                     <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                                        <Link :href="route('products.create')"
-                                            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
-                                        Add products
-                                        </Link>
+                                        <Button label="Add product" severity="primary">
+                                            <Link :href="route('products.create')">
+                                            Add products
+                                            </Link>
+                                        </Button>
                                     </div>
+
+
                                 </div>
                                 <div class="card">
                                     <DataTable :value="products.data" paginator :rows="5"
-                                        :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
-                                        <Column field="id" header="ID" style="width: 25%"></Column>
-                                        <Column field="name" header="NAME" style="width: 25%"></Column>
-                                        <Column field="category.name" header="CATEGORY" style="width: 25%"></Column>
+                                        :rowsPerPageOptions="[5, 10, 20, 50]"
+                                        tableStyle="min-width: 50rem;margin-top:2rem">
+                                        <Column field="id" header="ID"></Column>
+                                        <Column header="Image" style="width: 10%">
+                                            <template #body="products">
+                                                <img :src="`storage/products/${products.data.image}`"
+                                                    :alt="products.data.image" class="rounded shadow-md" />
+                                            </template>
+                                        </Column>
+                                        <Column field="name" header="Name" style="width: 25%"></Column>
+                                        <Column field="short_desc" header="Description"></Column>
+                                        <Column field="price" header="Price"></Column>
+                                        <Column field="stock" header="Stock"></Column>
+                                        <Column field="unlimited" header="Unlimited"></Column>
+                                        <Column field="category.name" header="Category"></Column>
+                                        <Column header="Created at">
+                                            <template #body="products">
+                                                {{ formatDate(products.data.created_at) }}
+                                            </template>
+                                        </Column>
+                                        <Column header="Updated at" style="width: 15%">
+                                            <template #body="products">
+                                                {{ formatDate(products.data.updated_at) }}
+                                            </template>
+                                        </Column>
+                                        <Column header="Actions" style="width: 10%">
+                                            <template #body="products">
+                                                <div class="flex justify-start gap-5">
+                                                    <Link :href="`/products/${products.data.id}/edit`"
+                                                        class="text-green-600 hover:text-green-900">
+                                                    <i class="pi pi-pencil" style="font-size: 1rem"></i>
+                                                    </Link>
+                                                    <!-- generate route and product argument -->
+                                                    <button @click="deleteProduct(products.data.id)"
+                                                        class="text-red-600 hover:text-red-900">
+                                                        <i class="pi pi-trash" style="font-size: 1rem"></i>
+                                                    </button>
+                                                </div>
+
+                                            </template>
+                                        </Column>
+
+
                                     </DataTable>
                                 </div>
                             </div>

@@ -1,16 +1,26 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm } from "@inertiajs/vue3";
-import { watch, ref } from "vue";
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import { watch, ref, onMounted } from "vue";
 import axios from "axios";
 import InputError from "@/Components/InputError.vue";
 import ToggleSwitch from 'primevue/toggleswitch';
+import Badge from 'primevue/badge';
+import { usePrimeVue } from 'primevue/config';
+
+const $primevue = usePrimeVue();
 
 const props = defineProps({
     categories: {
         type: Object,
     },
     variations: {
+        type: Object
+    },
+    product: {
+        type: Object
+    },
+    product_options: {
         type: Object
     }
 });
@@ -42,51 +52,47 @@ const cards = ref([
     {}
 ]);
 
-const form = useForm({
+// onmount set cards produ
 
-    name: null,
-    image: null,
-    short_desc: null,
-    category_id: null,
-    price: null,
-    stock: null,
-    unlimited: true,
-    variations: cards
+let product = usePage().props.product.data;
 
+// onmount set cards product options
+onMounted(() => {
+    alert(product.options);
+    if (product.options) {
+        console.log(product.options);
+        // cards.value = product.options;
+    }
 });
 
-// Método para actualizar el modelo de archivo de la variación
-function updateFileModel(event) {
-    const image = event.target.files[0];
-    return form.image = image;
-}
-
-// Método para generar una vista previa del archivo seleccionado
-function previewImage() {
-
-    if (form.image) {
-        return URL.createObjectURL(form.image);
-    }
-
-    return ''; // URL de una imagen por defecto o dejar vacío
-}
+const form = useForm({
+    id: product.id,
+    name: product.name,
+    file: null,
+    file2: null,
+    file3: null,
+    short_desc: product.short_desc,
+    category_id: product.category.id,
+    price: product.price,
+    stock: product.stock,
+    unlimited: Boolean(product.unlimited),
+    variations: cards,
+});
 
 const createProduct = () => {
-    form.post(route("products.store"))
-};
-
+    form.post(route("products.update", {
+        _method: 'patch',
+    }))
+}
 function addVariation() {
     cards.value.push({ options: [] });
 }
-
 const page = ref(0);
 const removeVariation = (index) => {
     cards.value.splice(index, 1);
     page.value = 0;
 };
-
 const variationOptions = ref([]);
-
 const getVariationOptions = async (variation_id, slotIndex) => {
     try {
         variationOptions.value[slotIndex] = [];
@@ -98,6 +104,7 @@ const getVariationOptions = async (variation_id, slotIndex) => {
         // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
 };
+
 // watcher cards uplaod to form
 watch(cards, (value) => {
     form.variations = value;
@@ -108,7 +115,6 @@ watch(cards, (value) => {
 <template>
 
     <Head title="Products list" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Products</h2>
@@ -165,7 +171,10 @@ watch(cards, (value) => {
                                                 <InputNumber class="w-full" v-model="form.stock" />
                                                 <InputError class="mt-2" :message="form.errors.stock" />
                                             </div>
-
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <label class="block text-sm font-medium text-gray-700">Unlimited</label>
+                                                <ToggleSwitch v-model="form.unlimited" />
+                                            </div>
                                             <div class="col-span-6 sm:col-span-6">
                                                 <label
                                                     class="block text-sm font-medium text-gray-700">Description</label>
@@ -173,31 +182,28 @@ watch(cards, (value) => {
                                                     id="short_desc" />
                                                 <InputError class="mt-2" :message="form.errors.short_desc" />
                                             </div>
+
                                             <div class="col-span-6 sm:col-span-6">
-                                                <div class="flex items-center space-x-6">
-                                                    <div class="shrink-0">
-                                                        <div v-if="form.image">
-                                                            <img :src="previewImage()"
-                                                                class="object-cover w-16 h-16 rounded" alt="Preview">
-                                                        </div>
-                                                        <div v-else>
-                                                            <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
-                                                                class="object-cover w-16 h-16 rounded" alt="Preview">
-                                                        </div>
-                                                    </div>
-
-                                                    <label class="block">
-                                                        <input type="file" @change="updateFileModel($event)"
-                                                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100 " />
-                                                    </label>
-
+                                                <label class="block text-sm font-medium text-gray-700">Image</label>
+                                                <div class="flex">
+                                                    <!-- <input type="file" @input="form.file = $event.target.files[0]" /> -->
+                                                    <FileUpload mode="basic" :customUpload="true"
+                                                        @input="form.file = $event.target.files[0]" accept="image/*"
+                                                        :maxFileSize="10000000">
+                                                    </FileUpload>
+                                                    <InputError class="mt-2" :message="form.errors.image" />
                                                 </div>
-                                                <InputError class="mt-2" :message="form.errors.image" />
-
                                             </div>
                                             <div class="col-span-6 sm:col-span-6">
-                                                <label class="block text-sm font-medium text-gray-700">Unlimited</label>
-                                                <ToggleSwitch v-model="form.unlimited" />
+                                                <label class="block text-sm font-medium text-gray-700">Image 2</label>
+                                                <div class="flex">
+                                                    <!-- <input type="file" @input="form.file = $event.target.files[0]" /> -->
+                                                    <FileUpload mode="basic" :customUpload="true"
+                                                        @input="form.file2 = $event.target.files[0]" accept="image/*"
+                                                        :maxFileSize="10000000">
+                                                    </FileUpload>
+                                                    <InputError class="mt-2" :message="form.errors.image" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -243,12 +249,7 @@ watch(cards, (value) => {
                                                                 <InputError class="mt-2"
                                                                     :message="form.errors.variation_price" />
                                                             </div>
-
-
                                                         </div>
-
-
-
                                                     </template>
                                                     <template #footer>
                                                         <div class="flex gap-3 mt-1">
@@ -273,65 +274,6 @@ watch(cards, (value) => {
                         </div>
                     </form>
 
-                    <!-- tabs -->
-                    <!-- <Tabs value="1">
-                            <TabList>
-                                <Tab class="capitalize" v-for="variation in variations"
-                                    :value="variation.id.toString()">
-                                    {{ variation.name }}
-                                </Tab>
-                                <Tab>
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                </Tab>
-                            </TabList>
-                            <TabPanels>
-                                <TabPanel v-for="variation in variations" :value="variation.id.toString()">
-                                    <p class="m-0 ">
-
-                                    <div class="col-span-6 sm:col-span-3">
-                                        <label class="block text-sm font-medium text-gray-700">Variation
-                                            option</label>
-                                        <MultiSelect v-model="objvariations[variation.id].options"
-                                            :options="variation.variation_options" optionValue="id" optionLabel="name"
-                                            placeholder="Select options" />
-                                    </div>
-                                    <div class="my-3">
-                                        <label class="block text-sm font-medium text-gray-700">Price</label>
-                                        <InputNumber v-model="objvariations[variation.id].price" :minFractionDigits="2"
-                                            :maxFractionDigits="2" />
-                                    </div>
-
-                                    <div class="flex items-center space-x-6">
-                                        <div class="shrink-0">
-                                            <div v-if="objvariations[[variation.id]].file">
-                                                <img :src="previewVariationImage(variation.id)"
-                                                    class="object-cover w-16 h-16 rounded" alt="Preview">
-                                            </div>
-                                            <div v-else>
-                                                <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
-                                                    class="object-cover w-16 h-16 rounded" alt="Preview">
-                                            </div>
-                                        </div>
-
-                                        <label class="block">
-                                            <input type="file" @change="updateFileModel($event, variation.id)"
-                                                class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100" />
-                                        </label>
-                                    </div>
-                                    </p>
-                                </TabPanel>
-                                <TabPanel>
-
-                                    <Select v-model="form.category_id" :options="categories.data" optionValue="id"
-                                        optionLabel="name" placeholder="Select a category" class="w-full" />
-                                </TabPanel>
-                            </TabPanels>
-                        </Tabs> -->
                 </div>
             </div>
         </div>

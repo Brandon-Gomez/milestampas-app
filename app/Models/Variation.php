@@ -9,17 +9,17 @@ class Variation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'product_id'];
+    protected $guarded = [];
 
     protected $with = ['variationOptions'];
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
 
     public function variationOptions()
     {
         return $this->hasMany(Variation_option::class);
+    }
+
+    public function productOptions()
+    {
+        return $this->hasMany(Product_options::class);
     }
 }

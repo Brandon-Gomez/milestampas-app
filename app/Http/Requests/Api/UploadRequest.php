@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreProductRequest extends FormRequest
+class UploadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -22,18 +22,7 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-        ];
-    }
-
-    public function attributes(): array
-    {
-        return [
-            'name' => 'Product Name',
-            'short_desc' => 'Short Description',
-            'price' => 'Product Price',
-            'stock' => 'Product Stock',
-            'category_id' => 'Category',
-            'image' => 'Product Image',
+            'file' => 'required|file|max:10000',
         ];
     }
 }
