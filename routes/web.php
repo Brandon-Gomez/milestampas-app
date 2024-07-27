@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -20,14 +21,16 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('products', ProductController::class);
-    // Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::patch('/products', [ProductController::class, 'update'])->name('products.update');
+    Route::patch('/categories', [ProductController::class, 'update'])->name('categories.update');
+    Route::resource('categories', CategoryController::class);
 
 });
 

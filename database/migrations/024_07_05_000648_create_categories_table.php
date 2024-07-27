@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $this->down();
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_category_id')->nullable()->constrained('categories');
+            $table->foreignId('parent_category_id')->constrained('categories')->nullable();
             $table->string('name');
+            $table->timestamps();
         });
 
     }
