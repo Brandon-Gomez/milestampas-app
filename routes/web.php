@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('variations', VariationController::class);
     Route::resource('variationOptions', VariationOptionController::class);
-    Route::patch('/variationOptions', [VariationOptionController::class, 'update'])->name('variationOptions.update');
+    Route::patch('/variationOptions', [VariationOptionController::class, 'update'])->name('variation_options.update');
 
 });
 

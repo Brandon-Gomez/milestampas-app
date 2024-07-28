@@ -40,23 +40,29 @@ class VariationOptionController extends Controller
     /**
      * Display the variation edit form.
      */
-    public function edit(Request $request, Variation_option $variation_option): Response
+    public function edit($variation_option_id): Response
     {
-        dd('test');
+        $variation_option = Variation_option::find($variation_option_id);
+        $variations = VariationResource::collection(Variation::all());
 
-        return inertia('VariationOptions/Edit', [
+        return inertia('Variation_options/Edit', [
             'variation_option' => $variation_option,
+            'variations' => $variations,
         ]);
     }
 
     /**
      * Update the variation information.
      */
-    public function update(Request $request, Variation_option $variation): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $variation->update($request->all());
+        $variationOption = Variation_option::find($request->id);
+        $variationOption->update([
+            'name' => $request->name,
+            'variation_id' => $request->variation_id,
+        ]);
 
-        return Redirect::route('variation_options.index');
+        return Redirect::route('variationOptions.index');
 
     }
 

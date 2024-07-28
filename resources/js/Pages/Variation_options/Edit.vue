@@ -7,21 +7,25 @@ import InputError from "@/Components/InputError.vue";
 import ToggleSwitch from 'primevue/toggleswitch';
 
 defineProps({
-    variation: {
+    variation_option: {
         type: Object,
         required: true,
     },
+    variations: {
+        type: Object,
+    },
 });
 
-const variation = usePage().props.variation;
+const variation_option = usePage().props.variation_option;
 
 const form = useForm({
-    name: variation.name,
-    description: variation.description,
+    id: variation_option.id,
+    name: variation_option.name,
+    variation_id: variation_option.variation_id,
 });
-const updateVariation = () => {
-    form.post(route("variations.update",
-        { _method: "PUT", variation: variation.id }
+const updateVariationOption = () => {
+    form.post(route("variation_options.update",
+        { _method: "PATCH" }
     ))
 };
 </script>
@@ -32,33 +36,29 @@ const updateVariation = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Variation</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Variation option</h2>
         </template>
-
         <!-- content -->
-
         <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-12 lg:gap-x-5">
                 <div class="space-y-6 sm:px-6 lg:px-0 lg:col-span-12">
-                    <form @submit.prevent="updateVariation" enctype="multipart/form-data">
+                    <form @submit.prevent="updateVariationOption" enctype="multipart/form-data">
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="px-4 py-6 space-y-6 bg-white sm:p-6">
                                 <div>
                                     <h3 class="text-lg font-medium leading-6 text-gray-900">
-                                        Variation Information
+                                        Variation Option Information
                                     </h3>
                                     <p class="mt-1 text-sm text-gray-500">
-                                        Use this form to create a new variation.
+                                        Use this form to edit variation option.
                                     </p>
                                 </div>
 
                                 <div class="flex">
-                                    <!-- Sección de inputs -->
                                     <div class="w-1/2 p-4">
                                         <div class="grid grid-cols-6 gap-6">
                                             <div class="col-span-6 sm:col-span-6">
                                                 <label class="block text-sm font-medium text-gray-700">Name</label>
-
                                                 <InputText class="w-full" type="text" v-model="form.name" id="name"
                                                     :class="{
                                                         'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300':
@@ -67,16 +67,15 @@ const updateVariation = () => {
                                                 <InputError class="mt-2" :message="form.errors.name" />
                                             </div>
                                             <div class="col-span-6 sm:col-span-6">
-                                                <label
-                                                    class="block text-sm font-medium text-gray-700">Description</label>
-                                                <Textarea class="w-full" v-model="form.description" rows="5" cols="30"
-                                                    id="description" />
-                                                <InputError class="mt-2" :message="form.errors.description" />
-                                            </div>
+                                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                                <Select v-model="form.variation_id" :options="variations.data"
+                                                    optionValue="id" class="w-full" optionLabel="name"
+                                                    placeholder="Select a variant" />
 
+                                                <InputError class="mt-2" :message="form.errors.name" />
+                                            </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="px-4 py-3 text-right bg-gray-50 sm:px-6">

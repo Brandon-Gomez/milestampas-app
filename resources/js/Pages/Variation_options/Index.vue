@@ -65,10 +65,11 @@ const deleteVariation = (variationOptionId) => {
                                         <Column header="Actions" style="width: 10%">
                                             <template #body="variationOptions">
                                                 <div class="flex justify-start gap-5">
-                                                    <Link :href="`/variationOptions/${variationOptions.data.id}/Edit`"
+                                                    <Link :href="route('variationOptions.edit', variationOptions.data)"
                                                         class="text-green-600 hover:text-green-900">
                                                     <i class="pi pi-pencil" style="font-size: 1rem"></i>
                                                     </Link>
+
                                                     <button @click="deleteVariation(variationOptions.data.id)"
                                                         class="text-red-600 hover:text-red-900">
                                                         <i class="pi pi-trash" style="font-size: 1rem"></i>
