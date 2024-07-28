@@ -58,7 +58,6 @@ let product = usePage().props.product.data;
 // let product_options = usePage().props.product_options.data;
 // onmount set cards product options
 
-
 const form = useForm({
     id: product.id,
     name: product.name,

@@ -55,16 +55,6 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category): RedirectResponse
     {
-        // data table
-        // 2 4 Bundesligue 2024-07-26 00:00:00 2024-07-26 23:31:48
-        // 4 2 Premier League 2024-07-26 23:07:20 2024-07-27 00:39:19
-
-        // validar para evitar el bucle 2 4 y 4 2
-
-        // check if parent id is the same as the category id
-
-        // get category by parent id
-
         $parentCategory = Category::find($request->parent_category_id);
 
         if ($parentCategory->parent_category_id == $category->id) {

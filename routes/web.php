@@ -3,6 +3,8 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VariationController;
+use App\Http\Controllers\VariationOptionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,6 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/products', [ProductController::class, 'update'])->name('products.update');
     Route::patch('/categories', [ProductController::class, 'update'])->name('categories.update');
     Route::resource('categories', CategoryController::class);
+    Route::resource('variations', VariationController::class);
+    Route::resource('variationOptions', VariationOptionController::class);
+    Route::patch('/variationOptions', [VariationOptionController::class, 'update'])->name('variationOptions.update');
 
 });
 

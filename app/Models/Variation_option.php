@@ -11,6 +11,8 @@ class Variation_option extends Model
 
     protected $guarded = [];
 
+    public $timestamps = false;
+
     public function variation()
     {
         return $this->belongsTo(Variation::class);
