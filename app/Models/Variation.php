@@ -20,6 +20,6 @@ class Variation extends Model
 
     public function productOptions()
     {
-        return $this->hasMany(Product_options::class);
+        return $this->hasMany(Product_option::class);
     }
 }

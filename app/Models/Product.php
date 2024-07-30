@@ -11,20 +11,15 @@ class Product extends Model
 
     protected $guarded = [];
 
-    protected $with = ['category'];
+    protected $with = ['category', 'options'];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // public function items()
-    // {
-    //     return $this->hasMany(Product_item::class);
-    // }
-
     public function options()
     {
-        return $this->hasMany(Product_options::class);
+        return $this->hasMany(Product_option::class);
     }
 }

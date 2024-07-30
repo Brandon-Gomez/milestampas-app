@@ -18,8 +18,8 @@ class Variation_option extends Model
         return $this->belongsTo(Variation::class);
     }
 
-    public function product_options()
+    public function product_option()
     {
-        return $this->hasMany(Product_options::class);
+        return $this->hasMany(Product_option::class);
     }
 }

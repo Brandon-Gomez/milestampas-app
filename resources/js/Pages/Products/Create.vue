@@ -46,6 +46,7 @@ const form = useForm({
 
     name: null,
     image: null,
+    image2: null,
     short_desc: null,
     category_id: null,
     price: null,
@@ -62,13 +63,9 @@ function updateFileModel(event) {
 }
 
 // Método para generar una vista previa del archivo seleccionado
-function previewImage() {
+function previewImage(image) {
 
-    if (form.image) {
-        return URL.createObjectURL(form.image);
-    }
-
-    return ''; // URL de una imagen por defecto o dejar vacío
+    return URL.createObjectURL(image);
 }
 
 const createProduct = () => {
@@ -173,32 +170,44 @@ watch(cards, (value) => {
                                                     id="short_desc" />
                                                 <InputError class="mt-2" :message="form.errors.short_desc" />
                                             </div>
-                                            <div class="col-span-6 sm:col-span-6">
-                                                <div class="flex items-center space-x-6">
-                                                    <div class="shrink-0">
-                                                        <div v-if="form.image">
-                                                            <img :src="previewImage()"
-                                                                class="object-cover w-16 h-16 rounded" alt="Preview">
-                                                        </div>
-                                                        <div v-else>
-                                                            <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
-                                                                class="object-cover w-16 h-16 rounded" alt="Preview">
-                                                        </div>
-                                                    </div>
 
-                                                    <label class="block">
-                                                        <input type="file" @change="updateFileModel($event)"
-                                                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-500 hover:file:bg-green-100 " />
-                                                    </label>
-
-                                                </div>
-                                                <InputError class="mt-2" :message="form.errors.image" />
-
-                                            </div>
                                             <div class="col-span-6 sm:col-span-6">
                                                 <label class="block text-sm font-medium text-gray-700">Unlimited</label>
                                                 <ToggleSwitch v-model="form.unlimited" />
                                             </div>
+                                            <div class="col-span-6 sm:col-span-6">
+                                                <div class="flex items-center space-x-6">
+
+                                                    <div v-if="form.image">
+                                                        <img :src="previewImage(form.image)"
+                                                            class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                    </div>
+                                                    <div v-else>
+                                                        <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                            class="object-cover rounded w-[4rem]" alt="Preview">
+                                                    </div>
+                                                    <FileUpload mode="basic" :customUpload="true"
+                                                        @input="form.image = $event.target.files[0]" accept="image/*">
+                                                    </FileUpload>
+                                                    <InputError class="mt-2" :message="form.errors.image" />
+                                                </div>
+
+                                                <div class="flex items-center mt-5 space-x-6">
+
+                                                    <div v-if="form.image2">
+                                                        <img :src="previewImage(form.image2)"
+                                                            class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                    </div>
+                                                    <div v-else>
+                                                        <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                            class="object-cover rounded w-[4rem]" alt="Preview">
+                                                    </div>
+                                                    <FileUpload mode="basic" :customUpload="true"
+                                                        @input="form.image2 = $event.target.files[0]" accept="image/*">
+                                                    </FileUpload>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                     <!-- Sección de la tarjeta -->
@@ -215,7 +224,6 @@ watch(cards, (value) => {
                                                             @click.prevent="removeVariation(slotIndex)">Remove</a>
                                                     </template>
                                                     <template #content>
-
                                                         <div class="grid grid-cols-12 gap-5">
                                                             <div class="col-span-12 sm:col-span-12">
                                                                 <Select
@@ -232,10 +240,8 @@ watch(cards, (value) => {
                                                                     placeholder="Select options" class="w-full" />
                                                                 <InputError class="mt-2"
                                                                     :message="form.errors.options" />
-
                                                             </div>
                                                             <div class="col-span-12 sm:col-span-12">
-
                                                                 <InputNumber placeholder="Variant increment price"
                                                                     class="w-full"
                                                                     v-model="cards[slotIndex].variation_price"
@@ -243,12 +249,7 @@ watch(cards, (value) => {
                                                                 <InputError class="mt-2"
                                                                     :message="form.errors.variation_price" />
                                                             </div>
-
-
                                                         </div>
-
-
-
                                                     </template>
                                                     <template #footer>
                                                         <div class="flex gap-3 mt-1">

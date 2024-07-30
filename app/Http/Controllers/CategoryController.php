@@ -14,7 +14,7 @@ class CategoryController extends Controller
     /**
      * Display the categories list.
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
         $categories = CategoryResource::collection(Category::paginate(10));
 
@@ -26,7 +26,7 @@ class CategoryController extends Controller
     /**
      * Display the create categories form.
      */
-    public function create(Request $request): Response
+    public function create(): Response
     {
         $categories = CategoryResource::collection(Category::all());
 
@@ -38,7 +38,7 @@ class CategoryController extends Controller
     /**
      * Display the category edit form.
      */
-    public function edit(Request $request, Category $category): Response
+    public function edit(Category $category): Response
     {
 
         $categories = CategoryResource::collection(Category::where('id', '!=', $category->id)->get());
@@ -73,7 +73,7 @@ class CategoryController extends Controller
     /**
      * Delete the category .
      */
-    public function destroy(Request $request, Category $category): RedirectResponse
+    public function destroy(Category $category): RedirectResponse
     {
 
         $category->delete();

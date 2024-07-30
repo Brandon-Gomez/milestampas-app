@@ -20,11 +20,9 @@ const deleteProduct = (productId) => {
 
     }
 }
-
 const formatDate = (date) => {
     return new Date(date).toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false });
 }
-
 </script>
 
 <template>
@@ -59,8 +57,6 @@ const formatDate = (date) => {
                                             </Link>
                                         </Button>
                                     </div>
-
-
                                 </div>
                                 <div class="card">
                                     <DataTable :value="products.data" paginator :rows="5"
@@ -70,10 +66,10 @@ const formatDate = (date) => {
                                         <Column header="Image" style="width: 10%">
                                             <template #body="products">
                                                 <img :src="`storage/products/${products.data.image}`"
-                                                    :alt="products.data.image" class="rounded shadow-md" />
+                                                    :alt="products.data.image" class="w-[3.5rem] rounded shadow-md" />
                                             </template>
                                         </Column>
-                                        <Column field="name" header="Name" style="width: 25%"></Column>
+                                        <Column field="name" header="Name"></Column>
                                         <Column field="short_desc" header="Description"></Column>
                                         <Column field="price" header="Price"></Column>
                                         <Column field="stock" header="Stock"></Column>
@@ -102,11 +98,8 @@ const formatDate = (date) => {
                                                         <i class="pi pi-trash" style="font-size: 1rem"></i>
                                                     </button>
                                                 </div>
-
                                             </template>
                                         </Column>
-
-
                                     </DataTable>
                                 </div>
                             </div>

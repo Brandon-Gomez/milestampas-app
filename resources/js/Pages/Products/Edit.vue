@@ -8,8 +8,6 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import Badge from 'primevue/badge';
 import { usePrimeVue } from 'primevue/config';
 
-const $primevue = usePrimeVue();
-
 const props = defineProps({
     categories: {
         type: Object,
@@ -20,9 +18,6 @@ const props = defineProps({
     product: {
         type: Object
     },
-    product_options: {
-        type: Object
-    }
 });
 
 const responsiveOptions = ref([
@@ -48,15 +43,40 @@ const responsiveOptions = ref([
     }
 ]);
 
+let product = usePage().props.product.data;
 const cards = ref([
     {}
 ]);
 
-// onmount set cards produ
+onMounted(async () => {
 
-let product = usePage().props.product.data;
-// let product_options = usePage().props.product_options.data;
-// onmount set cards product options
+    const variationMap = new Map();
+    for (let index = 0; index < product.options.length; index++) {
+        const option = product.options[index];
+        const variationId = option.variation_id;
+
+        if (variationMap.has(variationId)) {
+            const variation = variationMap.get(variationId);
+            variation.options.push(option.variation_option_id);
+        } else {
+            variationMap.set(variationId, {
+                variation: variationId,
+                options: [option.variation_option_id],
+                variation_price: option.price_increment,
+            });
+        }
+
+    }
+
+    for (let index = 0; index < variationMap.size; index++) {
+        const variationId = Array.from(variationMap.keys())[index];
+        await getVariationOptions(variationId, index);
+    }
+
+    cards.value = Array.from(variationMap.values());
+
+});
+
 
 const form = useForm({
     id: product.id,
@@ -72,7 +92,7 @@ const form = useForm({
     variations: cards,
 });
 
-const createProduct = () => {
+const updateProduct = () => {
     form.post(route("products.update", {
         _method: 'patch',
     }))
@@ -89,19 +109,25 @@ const variationOptions = ref([]);
 const getVariationOptions = async (variation_id, slotIndex) => {
     try {
         variationOptions.value[slotIndex] = [];
-        cards.value[slotIndex].options = null;
         const response = await axios.get(`/api/variationOptions?variation_id=${variation_id}`);
         variationOptions.value[slotIndex] = response.data.data;
+
     } catch (error) {
         console.error("Error fetching variation options:", error);
-        // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
 };
+
+function previewImage(file) {
+
+    return URL.createObjectURL(file);
+
+}
 
 // watcher cards uplaod to form
 watch(cards, (value) => {
     form.variations = value;
 }, { deep: true });
+
 
 </script>
 
@@ -118,7 +144,7 @@ watch(cards, (value) => {
         <div class="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-12 lg:gap-x-5">
                 <div class="space-y-6 sm:px-6 lg:px-0 lg:col-span-12">
-                    <form @submit.prevent="createProduct" enctype="multipart/form-data">
+                    <form @submit.prevent="updateProduct" enctype="multipart/form-data">
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="px-4 py-6 space-y-6 bg-white sm:p-6">
                                 <div>
@@ -180,9 +206,17 @@ watch(cards, (value) => {
                                                 <label class="block text-sm font-medium text-gray-700">Image</label>
                                                 <div class="flex">
                                                     <!-- <input type="file" @input="form.file = $event.target.files[0]" /> -->
-                                                    <FileUpload mode="basic" :customUpload="true"
-                                                        @input="form.file = $event.target.files[0]" accept="image/*"
-                                                        :maxFileSize="10000000">
+                                                    <div v-if="form.file">
+                                                        <img :src="previewImage(form.file)"
+                                                            class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                    </div>
+                                                    <div v-else>
+                                                        <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                            class="object-cover rounded w-[4rem]" alt="Preview">
+                                                    </div>
+
+                                                    <FileUpload class="ml-3" mode="basic" :customUpload="true"
+                                                        @input="form.file = $event.target.files[0]" accept="image/*">
                                                     </FileUpload>
                                                     <InputError class="mt-2" :message="form.errors.image" />
                                                 </div>
@@ -190,12 +224,18 @@ watch(cards, (value) => {
                                             <div class="col-span-6 sm:col-span-6">
                                                 <label class="block text-sm font-medium text-gray-700">Image 2</label>
                                                 <div class="flex">
-                                                    <!-- <input type="file" @input="form.file = $event.target.files[0]" /> -->
-                                                    <FileUpload mode="basic" :customUpload="true"
+                                                    <div v-if="form.file2">
+                                                        <img :src="previewImage(form.file2)"
+                                                            class="object-cover w-16 h-16 rounded" alt="Preview">
+                                                    </div>
+                                                    <div v-else>
+                                                        <img src="https://media.istockphoto.com/id/931643150/vector/picture-icon.jpg?s=612x612&w=0&k=20&c=St-gpRn58eIa8EDAHpn_yO4CZZAnGD6wKpln9l3Z3Ok="
+                                                            class="object-cover rounded w-[4rem]" alt="Preview">
+                                                    </div>
+                                                    <FileUpload class="ml-3" mode="basic" :customUpload="true"
                                                         @input="form.file2 = $event.target.files[0]" accept="image/*"
                                                         :maxFileSize="10000000">
                                                     </FileUpload>
-                                                    <InputError class="mt-2" :message="form.errors.image" />
                                                 </div>
                                             </div>
                                         </div>
@@ -234,7 +274,6 @@ watch(cards, (value) => {
 
                                                             </div>
                                                             <div class="col-span-12 sm:col-span-12">
-
                                                                 <InputNumber placeholder="Variant increment price"
                                                                     class="w-full"
                                                                     v-model="cards[slotIndex].variation_price"
@@ -253,7 +292,6 @@ watch(cards, (value) => {
                                                 </Card>
                                             </template>
                                         </Carousel>
-
                                     </div>
                                 </div>
                             </div>

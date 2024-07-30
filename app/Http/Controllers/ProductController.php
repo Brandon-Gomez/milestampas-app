@@ -63,6 +63,13 @@ class ProductController extends Controller
         $imagePath = $request->file('image')->store('public/products');
         $imageName = basename($imagePath); // Obtiene solo el nombre del archivo
         $validatedData['image'] = $imageName;
+
+        if ($request->hasFile('image2')) {
+            $imagePath = $request->file('image2')->store('public/products');
+            $imageName = basename($imagePath); // Obtiene solo el nombre del archivo
+            $validatedData['image2'] = $imageName;
+        }
+
         $product = Product::create($validatedData);
 
         if ($request->variations) {
