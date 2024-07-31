@@ -1,5 +1,7 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+// import npm install tailwind-scrollbar-hide
+import scrollbar from 'tailwind-scrollbar-hide';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -18,7 +20,6 @@ export default {
         },
     },
 
-    plugins: [forms],
-
+    plugins: [forms,scrollbar],
 
 };

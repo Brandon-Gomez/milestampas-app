@@ -31,6 +31,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Row from 'primevue/row';
 import Badge from 'primevue/badge';
+import { Swiper, SwiperSlide } from 'swiper/vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -72,6 +73,8 @@ createInertiaApp({
             .component('DataTable', DataTable)
             .component('Column', Column)
             .component('Row', Row)
+            .component('Swiper', Swiper)
+            .component('SwiperSlide', SwiperSlide)
             .component('Badge', Badge)
             .directive('ripple', Ripple)
             .mount(el);
