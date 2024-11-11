@@ -11,6 +11,7 @@ use App\Models\Variation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Inertia\Response;
 
 class ProductController extends Controller
 {
@@ -176,5 +177,25 @@ class ProductController extends Controller
             Storage::disk('public')->delete('products/'.$product->image3);
         }
         $product->delete();
+    }
+
+    public function show($productId): Response
+    {
+        // name url as show
+
+        
+
+        $product = Product::find($productId);
+
+        return inertia('Products/Show', [
+            'product' => ProductResource::make($product),
+        ]);
+    }
+
+    public function getProductsNewIn2024()
+    {
+        $products = Product::whereYear('created_at', 2024)->get();
+
+        return response()->json($products);
     }
 }

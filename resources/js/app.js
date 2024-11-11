@@ -7,7 +7,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PrimeVue from 'primevue/config';
-import Lara from '@primevue/themes/aura';
+import Aura from '@primevue/themes/aura';
 import Button from "primevue/button";
 import MultiSelect from 'primevue/multiselect';
 import InputText from 'primevue/inputtext';
@@ -32,7 +32,25 @@ import Column from 'primevue/column';
 import Row from 'primevue/row';
 import Badge from 'primevue/badge';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { definePreset } from '@primevue/themes';
 
+const CustomPreset = definePreset(Aura, {
+    semantic: {
+        primary: {
+            50: '{gray.50}',
+            100: '{gray.100}',
+            200: '{gray.200}',
+            300: '{gray.300}',
+            400: '{gray.400}',
+            500: '{gray.500}',
+            600: '{gray.600}',
+            700: '{gray.700}',
+            800: '{gray.800}',
+            900: '{gray.900}',
+            950: '{gray.950}'
+        }
+    }
+});
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -47,7 +65,7 @@ createInertiaApp({
                 ripple: true,
                 // unstyled: true,
                 theme: {
-                    preset: Lara,
+                    preset: CustomPreset,
                     options: {
                         darkModeSelector: '.my-app-dark',
                     }
@@ -76,6 +94,7 @@ createInertiaApp({
             .component('Swiper', Swiper)
             .component('SwiperSlide', SwiperSlide)
             .component('Badge', Badge)
+
             .directive('ripple', Ripple)
             .mount(el);
     },

@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.btn-primary {
+    @apply items-center w-full px-4 py-2 text-black border border-[#222] rounded hover:bg-[#222] hover:text-white h-14 transition duration-150 ease-in-out hover:border-[#222] font-black;
+}
+.btn-secondary {
+    @apply bg-[#ffb612] items-center w-full px-4 py-2 text-black border border-[#ffb612] rounded hover:bg-[#eba200]  h-14 transition duration-150 ease-in-out hover:border-[#eba200] font-black;
+}

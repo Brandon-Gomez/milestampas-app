@@ -22,21 +22,24 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/new2024', [ProductController::class, 'getProductsNewIn2024']);
+
+// Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // produ
     Route::resource('products', ProductController::class);
+    // show product
     Route::patch('/products', [ProductController::class, 'update'])->name('products.update');
     Route::patch('/categories', [ProductController::class, 'update'])->name('categories.update');
     Route::resource('categories', CategoryController::class);
     Route::resource('variations', VariationController::class);
     Route::resource('variationOptions', VariationOptionController::class);
     Route::patch('/variationOptions', [VariationOptionController::class, 'update'])->name('variation_options.update');
-
 });
 
 require __DIR__.'/auth.php';
