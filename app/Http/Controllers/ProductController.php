@@ -183,10 +183,8 @@ class ProductController extends Controller
     {
         // name url as show
 
-        
-
         $product = Product::find($productId);
-
+        
         return inertia('Products/Show', [
             'product' => ProductResource::make($product),
         ]);

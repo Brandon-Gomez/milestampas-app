@@ -9,6 +9,7 @@ import 'swiper/css/scrollbar';
 import 'swiper/css/effect-fade';
 import axios from 'axios';
 import { ref, onBeforeMount } from 'vue';
+
 import {
     Dialog,
     DialogPanel,
@@ -21,7 +22,6 @@ import {
 } from '@headlessui/vue';
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon, UserIcon } from '@heroicons/vue/24/outline';
 
-
 defineProps({
     canLogin: {
         type: Boolean,
@@ -29,14 +29,7 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
-    },
+
 });
 
 const navigation = {
@@ -145,11 +138,8 @@ const navigation = {
 
 const open = ref(false)
 
-
 </script>
 <template>
-
-    <Head title="Welcome" />
 
     <nav>
         <div class="bg-white">
@@ -180,7 +170,7 @@ const open = ref(false)
                                 </div>
 
                                 <!-- Links -->
-                                <TabGroup as="div" class="mt-2">
+                                <!-- <TabGroup as="div" class="mt-2">
                                     <div class="border-b border-gray-200">
                                         <TabList
                                             class="flex px-4 -mb-px space-x-8 overflow-scroll [@media(max-width:1023px)]:scrollbar-hide">
@@ -225,13 +215,13 @@ const open = ref(false)
                                             </div>
                                         </TabPanel>
                                     </TabPanels>
-                                </TabGroup>
+                                </TabGroup> -->
 
                                 <div class="px-4 py-6 space-y-6 border-t border-gray-200">
                                     <div v-for="page in navigation.pages" :key="page.name" class="flow-root">
                                         <a :href="page.href" class="block p-2 -m-2 font-medium text-gray-900">{{
                                             page.name
-                                            }}</a>
+                                        }}</a>
                                     </div>
                                 </div>
 
@@ -276,8 +266,8 @@ const open = ref(false)
                         <div class="flex ml-4 lg:ml-0">
                             <a href="#">
                                 <span class="sr-only">Your Company</span>
-                                <img class="w-auto h-8"
-                                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="" />
+                                <!-- <img class="w-auto h-8"
+                                    src="" alt="" /> -->
                             </a>
                         </div>
                         <!-- imput search full size -->
@@ -538,11 +528,7 @@ const open = ref(false)
         </div>
     </nav>
 
-
-
-    <slot />
-
-
+    <slot/>
 
     <footer class="relative z-10 pt-20 pb-10 lg:pt-[120px] lg:pb-20 px-4 bg-[#222325]">
         <div class="container mx-auto">
@@ -730,7 +716,5 @@ const open = ref(false)
         </div>
     </footer>
     <!-- ====== Footer Section End -->
-    <!-- ====== Footer Section End -->
-
 
 </template>

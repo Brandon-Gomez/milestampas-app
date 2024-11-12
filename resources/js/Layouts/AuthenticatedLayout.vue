@@ -24,7 +24,6 @@ const showingNavigationDropdown = ref(false);
                                 <ApplicationLogo class="block w-auto text-gray-800 fill-current h-9" />
                                 </Link>
                             </div>
-
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
@@ -33,7 +32,6 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('products.index')" :active="route().current('products.index')">
                                     Products
                                 </NavLink>
-
                             </div>
                         </div>
 

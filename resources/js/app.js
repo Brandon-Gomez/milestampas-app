@@ -34,6 +34,7 @@ import Badge from 'primevue/badge';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { definePreset } from '@primevue/themes';
 
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const CustomPreset = definePreset(Aura, {
     semantic: {
         primary: {
@@ -51,8 +52,6 @@ const CustomPreset = definePreset(Aura, {
         }
     }
 });
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
@@ -102,4 +101,3 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-

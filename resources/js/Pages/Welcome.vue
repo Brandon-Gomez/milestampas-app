@@ -29,14 +29,7 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
-    },
+    
 });
 
 let newproducts2024 = ref([]);
@@ -505,8 +498,8 @@ const scrollableTabs = ref(Array.from({ length: 50 }, (_, i) => ({ title: `Tab $
                     <div class="flex ml-4 lg:ml-0">
                         <a href="#">
                             <span class="sr-only">Your Company</span>
-                            <img class="w-auto h-8"
-                                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="" />
+                            <!-- <img class="w-auto h-8"
+                                src="" alt="" /> -->
                         </a>
                     </div>
                     <!-- imput search full size -->
@@ -886,8 +879,6 @@ const scrollableTabs = ref(Array.from({ length: 50 }, (_, i) => ({ title: `Tab $
 
 
     </section>
-
-
     <!-- Shop By Team -->
     <section class="px-4 mx-auto sm:px-6 lg:px-8 max-w-[107rem] mt-12 ">
         <div class="flex flex-col items-center ">
