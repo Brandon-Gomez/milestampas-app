@@ -4,6 +4,16 @@ import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { ref, onBeforeMount } from "vue";
 import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination, Scrollbar, EffectFade, Autoplay, Thumbs } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
+import 'swiper/css/effect-fade';
+import 'swiper/css/thumbs';
+
+
 
 defineProps({
     product: {
@@ -49,22 +59,20 @@ function addToCart() {
     form.post(route("cart.store"));
 }
 
-// let newproducts2024 = ref([]);
-// onBeforeMount(() => {
+let newproducts2024 = ref([]);
+onBeforeMount(() => {
 
-//     Promise.all([
-//         fetchSectionProducts(),
-//         // fetchSectionProducts('section2'),
-//         // y así sucesivamente para otras secciones
-//     ]).then(([data]) => {
-//         // Manejar los productos de cada sección
-//         data.forEach((product) => {
-//             newproducts2024.value.push(product);
-//         });
-//     });
-
-
-// });
+    Promise.all([
+        fetchSectionProducts(),
+        // fetchSectionProducts('section2'),
+        // y así sucesivamente para otras secciones
+    ]).then(([data]) => {
+        // Manejar los productos de cada sección
+        data.forEach((product) => {
+            newproducts2024.value.push(product);
+        });
+    });
+});
 const fetchSectionProducts = () => {
     return axios.get(`/products/new2024`)
         .then(response => response.data)
@@ -81,6 +89,26 @@ const form = useForm({
 });
 
 
+const modules = [Pagination, Navigation, Scrollbar, EffectFade, Autoplay, Thumbs];
+
+let thumbsSwiper = ref(null);
+
+const setThumbsSwiper = (swiper) => {
+    thumbsSwiper.value = swiper;
+};
+
+const sliders = [
+
+    { image: 'https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-2.jpg' },
+    { image: 'https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0.jpg' },
+    { image: 'https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-2.jpg' },
+    { image: 'https://swiperjs.com/demos/images/nature-4.jpg' },
+    { image: 'https://swiperjs.com/demos/images/nature-5.jpg' },
+    { image: 'https://swiperjs.com/demos/images/nature-6.jpg' },
+    { image: 'https://swiperjs.com/demos/images/nature-7.jpg' },
+    { image: 'https://swiperjs.com/demos/images/nature-8.jpg' },
+]
+
 </script>
 
 <template>
@@ -92,27 +120,43 @@ const form = useForm({
             <div class="font-sans px-4 mx-auto sm:px-6 lg:px-8 max-w-[107rem] ">
                 <div class="max-lg:mx-auto">
                     <div class="grid items-start grid-cols-1 gap-8 lg:grid-cols-3 max-lg:gap-16 py-7">
-                        <div class="top-0 flex flex-row w-full lg:col-span-2">
-                            <div class="hidden lg:block">
-                                <div class="p-1 mb-4 bg-white rounded shadow-sm">
-                                    <img src="https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0.jpg"
-                                        alt="" style="max-width: 60px; max-height: 60px">
-                                </div>
-                                <div class="p-1 mb-4 bg-white rounded shadow-sm">
-                                    <img src="https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0.jpg"
-                                        alt="" style="max-width: 60px; max-height: 60px">
-                                </div>
-                                <div class="p-1 mb-4 bg-white rounded shadow-sm">
-                                    <img src="https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0.jpg"
-                                        alt="" style="max-width: 60px; max-height: 60px">
-                                </div>
-                            </div>
+                        <div class="w-full lg:col-span-2">
+                            <div style="display: flex;"> <!-- Swiper Thumbs -->
+                                <swiper :direction="'vertical'" :modules="modules" @swiper="setThumbsSwiper"
+                                    :spaceBetween="10" :slidesPerView="4" :freeMode="true" :watchSlidesVisibility="true"
+                                    :watchSlidesProgress="true" class="select-none mySwiper">
+                                    <swiper-slide v-for="(slider, index) in sliders" :key="index">
+                                        <div class="p-2 rounded-md shadow-lg cursor-pointer">
+                                            <img :src="slider.image" />
+                                        </div>
+                                    </swiper-slide>
 
-                            <div class="mx-auto">
-                                <img fetchpriority="high" width="750" height="750"
-                                    class="object-cover object-top rounded-md img-fluid w-auto-ratio lg:w-11/12 "
-                                    src="https://www.futbolemotion.com/imagesarticulos/228611/750/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0.webp"
-                                    alt="camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0">
+                                </swiper> <!-- Swiper Principal -->
+                                <swiper
+                                    :style="{ '--swiper-navigation-color': '#fff', '--swiper-pagination-color': '#fff' }"
+                                    :spaceBetween="10" :navigation="true" :thumbs="{ swiper: thumbsSwiper }"
+                                    :modules="modules" class="select-none mySwiper2">
+                                    <swiper-slide><img
+                                            src="https://www.futbolemotion.com/imagesarticulos/228611/750/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-0.webp " /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-1.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://www.futbolemotion.com/imagesarticulos/228611/60/camiseta-adidas-real-madrid-primera-equipacion-authentic-2024-2025-white-2.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-4.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-5.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-6.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-7.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-8.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-9.jpg" /></swiper-slide>
+                                    <swiper-slide><img
+                                            src="https://swiperjs.com/demos/images/nature-10.jpg" /></swiper-slide>
+                                </swiper>
                             </div>
                         </div>
                         <div class="lg:pl-8">

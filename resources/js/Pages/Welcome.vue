@@ -1,14 +1,15 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import { Navigation, Pagination, Scrollbar, EffectFade, Autoplay } from 'swiper/modules';
+import axios from 'axios';
+import { ref, onBeforeMount } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import 'swiper/css/effect-fade';
-import axios from 'axios';
-import { ref, onBeforeMount } from 'vue';
+
 import {
     Dialog,
     DialogPanel,
@@ -21,7 +22,6 @@ import {
 } from '@headlessui/vue';
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon, UserIcon } from '@heroicons/vue/24/outline';
 
-
 defineProps({
     canLogin: {
         type: Boolean,
@@ -29,7 +29,7 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    
+
 });
 
 let newproducts2024 = ref([]);
