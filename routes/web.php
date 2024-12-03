@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -25,6 +26,12 @@ Route::get('/dashboard', function () {
 Route::get('/products/new2024', [ProductController::class, 'getProductsNewIn2024']);
 
 // Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/cart', [CartController::class, 'Index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+// Route::get('/cart', [CartController::class, 'get'])->name('cart.get');
+// Route::post('/cart/add/', [CartController::class, 'add'])->name('add');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
 Route::middleware('auth')->group(function () {
@@ -34,7 +41,7 @@ Route::middleware('auth')->group(function () {
     // produ
     Route::resource('products', ProductController::class);
     // show product
-    Route::patch('/products', [ProductController::class, 'update'])->name('products.update');
+    // Route::patch('/products', [ProductController::class, 'update'])->name('products.update');
     Route::patch('/categories', [ProductController::class, 'update'])->name('categories.update');
     Route::resource('categories', CategoryController::class);
     Route::resource('variations', VariationController::class);
